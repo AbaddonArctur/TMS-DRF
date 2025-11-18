@@ -1,8 +1,10 @@
-from django.test import TestCase
 from django.contrib.auth import get_user_model
-from recipes.models import Recipe, Ingredient, Comment
+from django.test import TestCase
+
+from recipes.models import Comment, Ingredient, Recipe
 
 User = get_user_model()
+
 
 class ModelsTestCase(TestCase):
     def setUp(self):
@@ -12,7 +14,7 @@ class ModelsTestCase(TestCase):
             category="Супы",
             author=self.user,
             description="Desc",
-            instructions="Instr"
+            instructions="Instr",
         )
 
     def test_ingredient_creation(self):
@@ -25,7 +27,11 @@ class ModelsTestCase(TestCase):
         self.assertEqual(c.text, "Хорошо")
 
     def test_reply_creation(self):
-        parent = Comment.objects.create(recipe=self.recipe, author=self.user, text="Осн.")
-        reply = Comment.objects.create(recipe=self.recipe, author=self.user, text="Ответ", parent=parent)
+        parent = Comment.objects.create(
+            recipe=self.recipe, author=self.user, text="Осн."
+        )
+        reply = Comment.objects.create(
+            recipe=self.recipe, author=self.user, text="Ответ", parent=parent
+        )
         self.assertEqual(parent.replies.count(), 1)
         self.assertEqual(parent.replies.first().text, "Ответ")

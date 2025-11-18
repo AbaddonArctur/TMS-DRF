@@ -1,8 +1,10 @@
-from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Recipe, Ingredient, Comment
+from rest_framework import serializers
+
+from .models import Comment, Ingredient, Recipe
 
 User = get_user_model()
+
 
 class IngredientSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
@@ -10,6 +12,7 @@ class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
         fields = ("id", "name", "amount")
+
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(read_only=True)
@@ -24,6 +27,7 @@ class CommentSerializer(serializers.ModelSerializer):
         qs = obj.replies.all()
         return CommentSerializer(qs, many=True).data
 
+
 class RecipeSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(read_only=True)
     ingredients = IngredientSerializer(many=True)
@@ -31,8 +35,18 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ("id", "title", "category", "description", "instructions", "image",
-                  "author", "created_at", "ingredients", "comments")
+        fields = (
+            "id",
+            "title",
+            "category",
+            "description",
+            "instructions",
+            "image",
+            "author",
+            "created_at",
+            "ingredients",
+            "comments",
+        )
 
     def get_comments(self, obj):
         qs = obj.comments.filter(parent__isnull=True)

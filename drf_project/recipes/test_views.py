@@ -1,10 +1,12 @@
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
+
 from recipes.models import Recipe
 
 User = get_user_model()
+
 
 class RecipeApiTestCase(TestCase):
     def setUp(self):
@@ -35,7 +37,7 @@ class RecipeApiTestCase(TestCase):
             "ingredients": [
                 {"name": "Мука", "amount": "500 г"},
                 {"name": "Сыр", "amount": "300 г"},
-            ]
+            ],
         }
 
         response = self.client.post(self.list_url, data, format="json")
@@ -52,9 +54,7 @@ class CommentApiTestCase(TestCase):
         self.user2 = User.objects.create_user(username="u2", password="123")
 
         self.recipe = Recipe.objects.create(
-            title="Суп",
-            category="Супы",
-            author=self.user
+            title="Суп", category="Супы", author=self.user
         )
 
         token_url = reverse("token_obtain_pair")
@@ -80,9 +80,7 @@ class CommentApiTestCase(TestCase):
         parent = self.client.post(url, {"text": "Главный коммент"}, format="json").data
 
         resp2 = self.client.post(
-            url,
-            {"text": "Ответ", "parent": parent["id"]},
-            format="json"
+            url, {"text": "Ответ", "parent": parent["id"]}, format="json"
         )
 
         self.assertIn(resp2.status_code, [200, 201])

@@ -1,11 +1,13 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from .models import Recipe, Comment
-from .serializers import RecipeSerializer, CommentSerializer, IngredientSerializer
+
+from .models import Comment, Recipe
 from .permissions import IsAuthorOrReadOnly
+from .serializers import CommentSerializer, IngredientSerializer, RecipeSerializer
+
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
@@ -28,6 +30,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             serializer.save(recipe=recipe)
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer

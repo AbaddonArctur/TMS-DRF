@@ -1,9 +1,12 @@
 from django.contrib import admin
-from .models import Recipe, Ingredient, Comment
+
+from .models import Comment, Ingredient, Recipe
+
 
 class IngredientInline(admin.TabularInline):
     model = Ingredient
     extra = 1
+
 
 class CommentInline(admin.TabularInline):
     model = Comment
@@ -12,10 +15,12 @@ class CommentInline(admin.TabularInline):
     fields = ("author", "text", "parent", "created_at")
     readonly_fields = ("created_at",)
 
+
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ("title", "category", "author", "created_at")
     inlines = [IngredientInline, CommentInline]
+
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
