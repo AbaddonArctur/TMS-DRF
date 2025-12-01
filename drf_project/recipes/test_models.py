@@ -21,17 +21,14 @@ class ModelsTestCase(TestCase):
         Ingredient.objects.create(recipe=self.recipe, name="Соль", amount="10 г")
         self.assertEqual(self.recipe.ingredients.count(), 1)
 
-    def test_comment_creation(self):
-        c = Comment.objects.create(recipe=self.recipe, author=self.user, text="Хорошо")
-        self.assertEqual(self.recipe.comments.count(), 1)
-        self.assertEqual(c.text, "Хорошо")
-
-    def test_reply_creation(self):
+    def test_comment_and_reply_creation(self):
         parent = Comment.objects.create(
-            recipe=self.recipe, author=self.user, text="Осн."
+            recipe=self.recipe, author=self.user, text="Parent"
         )
         reply = Comment.objects.create(
-            recipe=self.recipe, author=self.user, text="Ответ", parent=parent
+            recipe=self.recipe, author=self.user, text="Reply", parent=parent
         )
+
+        self.assertEqual(self.recipe.comments.filter(parent__isnull=True).count(), 1)
         self.assertEqual(parent.replies.count(), 1)
-        self.assertEqual(parent.replies.first().text, "Ответ")
+        self.assertEqual(parent.replies.first().text, "Reply")
