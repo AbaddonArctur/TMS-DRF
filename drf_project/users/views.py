@@ -1,5 +1,6 @@
 from django.conf import settings
-from rest_framework import status
+from django.contrib.auth import get_user_model
+from rest_framework import generics, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,6 +9,16 @@ from rest_framework_simplejwt.serializers import (
     TokenRefreshSerializer,
 )
 from rest_framework_simplejwt.views import TokenObtainPairView
+
+from .serializers import UserRegisterSerializer
+
+User = get_user_model()
+
+
+class UserRegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserRegisterSerializer
+    permission_classes = [AllowAny]
 
 
 class CookieTokenObtainPairView(TokenObtainPairView):
@@ -19,8 +30,8 @@ class CookieTokenObtainPairView(TokenObtainPairView):
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
 
-        access = data.get("access")
-        refresh = data.get("refresh")
+        access = data["access"]
+        refresh = data["refresh"]
 
         response = Response(
             {"detail": "OK", "access": access, "refresh": refresh},
@@ -36,6 +47,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
         response.set_cookie(
             "refresh", refresh, httponly=True, secure=cookie_secure, samesite=samesite
         )
+
         return response
 
 
@@ -48,9 +60,12 @@ class CookieTokenRefreshView(APIView):
             return Response(
                 {"detail": "refresh not provided"}, status=status.HTTP_400_BAD_REQUEST
             )
-        s = TokenRefreshSerializer(data={"refresh": refresh})
-        s.is_valid(raise_exception=True)
-        access = s.validated_data["access"]
+
+        serializer = TokenRefreshSerializer(data={"refresh": refresh})
+        serializer.is_valid(raise_exception=True)
+
+        access = serializer.validated_data["access"]
+
         response = Response(
             {"access": access, "detail": "refreshed"}, status=status.HTTP_200_OK
         )

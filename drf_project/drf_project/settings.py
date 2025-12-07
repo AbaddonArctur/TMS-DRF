@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "drf_yasg",
     "recipes",
+    "users",
 ]
 
 MIDDLEWARE = [
@@ -164,6 +165,8 @@ CSRF_COOKIE_SECURE = os.getenv("CSRF_COOKIE_SECURE", "false").lower() == "true"
 
 USE_REDIS = os.getenv("USE_REDIS", "false").lower() == "true"
 
+RECIPES_CACHE_TIME = 60
+
 if USE_REDIS:
     CACHES = {
         "default": {
@@ -190,3 +193,5 @@ else:
     }
 
     SESSION_ENGINE = "django.contrib.sessions.backends.db"
+
+AUTH_USER_MODEL = "users.User"

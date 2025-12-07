@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
@@ -10,8 +11,6 @@ from rest_framework.response import Response
 from .models import Comment, Recipe
 from .permissions import IsAuthorOrReadOnly
 from .serializers import CommentSerializer, IngredientSerializer, RecipeSerializer
-
-CACHE_TIME = 60
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -30,11 +29,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return [IsAuthenticated(), IsAuthorOrReadOnly()]
         return [AllowAny()]
 
-    @method_decorator(cache_page(CACHE_TIME))
+    @method_decorator(cache_page(settings.RECIPES_CACHE_TIME))
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-    @method_decorator(cache_page(CACHE_TIME))
+    @method_decorator(cache_page(settings.RECIPES_CACHE_TIME))
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
 
@@ -75,7 +74,7 @@ class CommentViewSet(viewsets.ModelViewSet):
             return Comment.objects.filter(recipe_id=recipe_pk, parent__isnull=True)
         return Comment.objects.filter(parent__isnull=True)
 
-    @method_decorator(cache_page(CACHE_TIME))
+    @method_decorator(cache_page(settings.RECIPES_CACHE_TIME))
     def list(self, *args, **kwargs):
         return super().list(*args, **kwargs)
 
