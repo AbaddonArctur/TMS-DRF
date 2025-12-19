@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    container_name: tms-drf-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  redis:
+    image: redis:7
+    container_name: tms-drf-redis
+    restart: always
+    ports:
+      - "6380:6379"
+
+  web:
+    build: .
+    container_name: tms-drf-web
+    restart: always
+    command: python drf_project/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+      - media_data:/app/drf_project/media
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DJANGO_SECRET_KEY=${SECRET_KEY}
+      - DEBUG=1
+      - USE_REDIS=True
+    depends_on:
+      - db
+      - redis
+    ports:
+      - "8001:8000"
+
+volumes:
+  db_data:
+  media_data:
