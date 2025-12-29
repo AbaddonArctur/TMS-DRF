@@ -14,6 +14,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from celery.schedules import crontab
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -46,6 +47,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "drf_yasg",
+    "django_celery_beat",
+    "celery_tasks",
     "recipes",
     "users",
 ]
@@ -195,3 +198,19 @@ else:
     SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 AUTH_USER_MODEL = "users.User"
+
+CELERY_BROKER_URL = "redis://localhost:6380/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6380/1"
+
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_TIMEZONE = "UTC"
+
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+
+CELERY_BEAT_SCHEDULE = {
+    "example-task-every-minute": {
+        "task": "celery_tasks.tasks.example_task",
+        "schedule": crontab(minute="*/1"),
+    },
+}

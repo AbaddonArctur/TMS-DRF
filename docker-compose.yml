@@ -44,6 +44,20 @@ services:
     ports:
       - "8001:8000"
 
+  celery:
+    build: .
+    command: celery -A drf_project worker -l info
+    depends_on:
+      - redis
+      - db
+
+  celery-beat:
+    build: .
+    command: celery -A drf_project beat -l info
+    depends_on:
+      - redis
+      - db
+
 volumes:
   db_data:
   media_data:
