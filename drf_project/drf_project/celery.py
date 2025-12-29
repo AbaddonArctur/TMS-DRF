@@ -1,5 +1,6 @@
 import os
 import platform
+
 from celery import Celery
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "drf_project.settings")
