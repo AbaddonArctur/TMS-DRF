@@ -36,6 +36,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("recipes.urls")),
+    path("api/celery/", include("celery_tasks.urls")),
     path("api/users/", include("users.urls")),
     path("api/token/", CookieTokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", CookieTokenRefreshView.as_view(), name="token_refresh"),
